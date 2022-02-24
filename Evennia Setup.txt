@@ -1,0 +1,100 @@
+#Original OS used: Ubuntu 20.04
+
+++Getting started++
+#install prereqs
+sudo apt-get update
+sudo apt-get install python3 python3-dev python3-setuptools virtualenv gcc postgresql postgresql-client
+
+#install syllables for haiku puzzle
+pip3 install syllables
+
+#create dev area
+mkdir muddev
+cd muddev
+
+#clone in evennia
+git clone https://github.com/evennia/evennia.git
+
+#define and enter virtualenv
+#determine version: python3 -V
+virtualenv -p /usr/bin/python3.8 evenv
+source evenv/bin/activate
+
+#install evennia and psycopg2 (needed for postresql)
+pip install -e evennia
+evennia --init pq3
+pip install psycopg2-binary
+
+#leave virtualenv
+deactivate
+
+++Setting up Postgres Databases++
+#change user to postgres
+sudo -i -u postgres
+
+#initiate database management
+psql
+
+#set password for postgres superuser
+\password
+
+#create evennia user and db while in psql
+CREATE USER evennia WITH PASSWORD 'somepassword';
+CREATE DATABASE evennia;
+
+#set permisisons and settings
+ALTER ROLE evennia SET client_encoding TO 'utf8';
+ALTER ROLE evennia SET default_transaction_isolation TO 'read committed';
+ALTER ROLE evennia SET timezone TO 'UTC';
+
+#grant privs to evennia user
+GRANT ALL PRIVILEGES ON DATABASE evennia TO evennia;
+
+#check db's and permissions
+\l
+
+#quit psql
+\q 
+
+#leave postgres user session
+CRTL+D
+
+++Setup Evennia Database Config++
+nano pq3/server/conf/secret_settings.py
+
+#PostgreSQL Database Configuration
+DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'evennia',
+            'USER': 'evennia',
+            'PASSWORD': 'somepassword',
+            'HOST': 'localhost',
+            'PORT': ''
+        }}
+
+#exit and save
+ctrl+x
+
+++Finish Evennia Setup++
+#enter virtualenv again
+source evenv/bin/activate
+
+#make sure you're in the game directory
+#populate database
+evennia migrate
+
+#pray to your gods. If all goes well start evennia
+evennia start
+==================================================
+
+At this point you have a vanilla base evennia install.
+You need to stop evennia before going forward.
+
+#Running PepperQuest3
+Clone in the typeclasses and commands from the Pepperquest3 repo
+Download the database file
+Restore the database (This is left as an exercise for the reader, because I couldn't figure it out and I don't want to keep trying ;))
+start evennia
+Login with the login info.
+
