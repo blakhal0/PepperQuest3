@@ -1,0 +1,2 @@
+AFTER DATABASE RESTORE
+evennia superuser: peppergod Pass: PQPublic1
